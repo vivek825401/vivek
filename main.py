@@ -5,7 +5,7 @@ from bson import ObjectId
 from pymongo import MongoClient , UpdateOne
 import time 
 
-client = MongoClient("mongodb+srv://MAS:kGxFdl8hScuATnbB@cluster0.jrapvjp.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://vivek1612prasad:dora1emon@cluster0.tfs7mpf.mongodb.net/?retryWrites=true&w=majority")
 db = client["main_p2p"]
 
 bot = telebot.TeleBot("6346644509:AAEJJlYGS2mbj2Acivr4M3R8wesFcxQERqc")
