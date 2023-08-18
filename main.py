@@ -321,7 +321,7 @@ def reply2(message,pr_id):
 @bot.callback_query_handler(func=lambda call:
 call.data.startswith("/stats"))
 def handle_stats(call):
-  bot.send_message(call.message.chat.id,f"📊 Bot Live Stats 📊\n\n💡 Total Users: {users_collection.count_documents({})} User(s)\n\n🤟 Codes Maker: @abhishek71599")
+  bot.send_message(call.message.chat.id,f"📊 Bot Live Stats 📊\n\n💡 Total Users: {users_collection.count_documents({})} User(s)\n\n🤟 Codes Maker: @vivek161215")
         
 @bot.callback_query_handler(func=lambda call:
 call.data.startswith("/payment"))
