@@ -8,14 +8,14 @@ import time
 client = MongoClient("mongodb+srv://vivek1612prasad:dora1emon@cluster0.tfs7mpf.mongodb.net/?retryWrites=true&w=majority")
 db = client["main_p2p"]
 
-bot = telebot.TeleBot("6346644509:AAEJJlYGS2mbj2Acivr4M3R8wesFcxQERqc")
+bot = telebot.TeleBot("6484492820:AAF8pz_Mf8xpVCTKXBke0a0lmp28m2WxW_k")
 bot_info = bot.get_me()
 user_states = {}
 user_state = {}
 user_data = {}
 users_collection = db["users"]
-admch = "-990854713"
-paych = "@p20demo1612"
+admch = "-5724936702 "
+paych = "@p2psellerbot"
 
 
 
