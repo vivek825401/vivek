@@ -742,8 +742,7 @@ def handle_order_callback(call):
     collection = db['orders']
     collections = db['pay-method']
     datas = collection.find({"user_id": call.message.chat.id})
-    
-    if collection.count_documents({"user_id": call.message.chat.id,"status":"active"}) == 0 :
+    if collection.count_documents({"user_id": call.message.chat.id}) == 0 :
       
       
       bot.send_message(call.message.chat.id,"🔎 No Ads Found")
@@ -751,10 +750,7 @@ def handle_order_callback(call):
       #keyboard = InlineKeyboardMarkup()
       #keyboard.row(InlineKeyboardButton("➖ Delete",callback_data="/delete")
       for data in datas:
-        
-      
-        
-        method_cursor = collections.find_one({"_id": ObjectId(data['method'])})
+        method_cursor = collections.find_one({"_id": ObjectId(data.get('method'))})
         if method_cursor:
           user = bot.get_chat(data['user_id'])
           trade = collection.count_documents({"user_id": data['user_id'],"status":"completed"})
@@ -772,8 +768,6 @@ def handle_order_callback(call):
           keyboard = InlineKeyboardMarkup().add(delete_button)
 
           bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
-        
-
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("delete_ad:"))
 def delete_ad_callback(call):
