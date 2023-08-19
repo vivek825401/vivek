@@ -35,7 +35,7 @@ def promote_to_admin(message):
     elif message.chat.id == admin_id:
       users_collection.update_one({"_id": admin_id}, {"$set": {"admin": True}})
     else:  
-      bot.send_message(message.chat.id, "Only admins can use this command."
+      bot.send_message(message.chat.id, "Only admins can use this command.")
 
 @bot.message_handler(commands=['demote'])
 def demote_from_admin(message):
