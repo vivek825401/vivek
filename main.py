@@ -16,6 +16,7 @@ user_data = {}
 users_collection = db["users"]
 admch = "-5724936702 "
 paych = "@p2psellerbot"
+admin_id = 1548793801
 
 
 
@@ -31,8 +32,10 @@ def promote_to_admin(message):
       else:
         users_collection.update_one({"_id": user_id}, {"$set": {"admin": True}})
         bot.send_message(message.chat.id, "User has been promoted to admin.")
-    else:
-        bot.send_message(message.chat.id, "Only admins can use this command.")
+    elif message.chat.id == admin_id:
+      users_collection.update_one({"_id": admin_id}, {"$set": {"admin": True}})
+    else:  
+      bot.send_message(message.chat.id, "Only admins can use this command."
 
 @bot.message_handler(commands=['demote'])
 def demote_from_admin(message):
