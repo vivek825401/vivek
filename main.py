@@ -98,7 +98,7 @@ def info_message(message):
           collections = db["pay-method"]
           method_cursor= collections.find({"_id": ObjectId(datas['method'])})
           method = method_cursor[0]
-          bot.send_message(message.chat.id, f"*📢 Type:* `{datas['type']}`\n🔐 *Status:* `{datas['status']}`\n*💸 {datas['type']}ing Amount: *`{datas['famo']}`\n*👉 {datas['type']}ing for: *`{datas['aamo']}`\n\n*1️⃣st Party User Details:-* \n\n  *    🆔User Id: *`{datas['user_id']}`\n  *    💼User Address: *`{method['method_details']}`\n\n*2️⃣nd Party User Details:-*\n\n  *    🆔User Id: *`{datas.get('user_id2','None')}` \n      💼*User Address: *`{datas.get('user_adrs','None')}`\n\n*🤝 Admin Details:-* \n\n      🔐*Admin Id:* `{datas.get('admin','None')}`\n      🔐*Admin Address:* `{datas.get('admin_address','None')}`","markdown")        
+          bot.send_message(message.chat.id, f"*📢 Type:* `{datas['type']}`\n*💸 {datas['type']}ing Amount: *`{datas['famo']}`\n*👉 {datas['type']}ing for: *`{datas['aamo']}`\n\n*1️⃣st Party User Details:-* \n\n  *    🆔User Id: *`{datas['user_id']}`\n  *    💼User Address: *`{method['method_details']}`\n  *    📝Transaction Id:* `{datas.get('tr_id')}`\n\n*2️⃣nd Party User Details:-*\n\n  *    🆔User Id: *`{datas.get('user_id2','None')}` \n      💼*User Address: *`{datas.get('user_adrs','None')}`\n\n*🤝 Admin Details:-* \n\n      🔐*Admin Id:* `{datas.get('admin','None')}`\n      🔐*Admin Address:* `{datas.get('admin_address','None')}`","markdown")        
     else: 
       bot.send_message(message.chat.id,"Admins Command")
   #except IndexError as e:
@@ -495,19 +495,21 @@ def admin_address(message,id):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/aconfirm'))
 def handle_aconfirm_query(call):
   bot.delete_message(call.message.chat.id,call.message.id)
-  collection =db['orders']
   id = call.data.split("/aconfirm ")[1]
-  data = collection.find({"uid":int(id)})
-  for datas in data:
-   admin = datas['admin']
-  
-  bot.send_message(admin,"Kindly Check Your Account User have Marked The Payment Done")
+  bot.send_message(call.message.chat.id,"Kindly Enter Your Transaction Id or Link")
+  bot.register_next_step_handler(call.message,tr_id,id)
+
+def tr_id(message,id):
+  collection = db['orders']
+  collection.update_one({"uid": int(id)}, {"$set":{"tr_id":message.text}})
+  data = collection.find_one({"uid":int(id)})
+  admin = data['admin']
   keyboard = InlineKeyboardMarkup()
   keyboard.row(
-    InlineKeyboardButton("👍 Recieved",callback_data=f"/received {id} {call.message.chat.id}"),InlineKeyboardButton("👎 Not Recieved", callback_data=f"/received no {call.message.chat.id} {id}")
+    InlineKeyboardButton("👍 Recieved",callback_data=f"/received {id} {message.chat.id}"),InlineKeyboardButton("👎 Not Recieved", callback_data=f"/received no {message.chat.id} {id}")
   )
-  bot.send_message(admin,"Choose Option Below",reply_markup=keyboard)
-  bot.send_message(call.message.chat.id,"Kindly Wait Now\n\nOur Team Will Reach You")
+  bot.send_message(admin,f"Order Id: `{id}`\nTransaction:- `{message.text}`\nKindly Check Your Account User have Marked The Payment Done","markdown",reply_markup=keyboard)
+  bot.send_message(message.chat.id,"Kindly Wait Now")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/received'))
 def handle_recieved_query(call):
@@ -529,12 +531,12 @@ def handle_recieved_query(call):
     trade = collection.count_documents({"user_id": idd[1],"status":"completed"})
     skeyboard = InlineKeyboardMarkup()
     skeyboard.row(InlineKeyboardButton("🛒 Deal Now",url=f"https://t.me/{bot_info.username}?start=order{idd[0]}"))
-    bot.send_message(paych,f"*New Ad Created *\n\n*📝 Ad For* = `{data['type']}`\n🧾 *{data['type']}ing Assets* = `{data['famo']}`\n💲 *{data['type']}ing in* = `{data['aamo']}`\n*🗣️ Total Trades* = `{trade}`\n\n🏧 *Payment Method* :-\n*🔹 Method Name* = `{method['method_name']}`\n🔹 *Method Details* = `{method['method_details']}`\n⌛ *Status* :- `Active`", reply_markup=skeyboard,parse_mode='markdown')
+    bot.send_message(paych,f"*New Ad Created *\n\n\n*📝 Ad For* = `{data['type']}`\n🧾 *{data['type']}ing Assets* = `{data['famo']}`\n💲 *{data['type']}ing in* = `{data['aamo']}`\n*🗣️ Total Trades* = `{trade}`\n\n🏧 *Payment Method* :-\n*🔹 Method Name* = `{method['method_name']}`\n🔹 *Method Details* = `{method['method_details']}`\n⌛ *Status* :- `Active`", reply_markup=skeyboard,parse_mode='markdown')
     keyboard = InlineKeyboardMarkup()
     keyboard.row(
     InlineKeyboardButton("💱 Refund",callback_data=f"/refund {idd[0]} {call.message.chat.id} {idd[1]}")
   )
-    bot.send_message(call.message.chat.id,"Kindly Be Online and Wait for 2nd Party To join You\n\nIf There is no further Conversation Occur Kindky Click on 💱 Refund",reply_markup=keyboard)
+    bot.send_message(call.message.chat.id,f"Order Id: `{idd[0]}`\n\nKindly Be Online and Wait for 2nd Party To join You\n\nIf There is no further Conversation Occur Kindky Click on 💱 Refund",reply_markup=keyboard,parse_mode="markdown")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/refund'))
@@ -564,12 +566,13 @@ def take(message,id,chat_id):
   keyboard.row(
     InlineKeyboardButton("✅ Confirm",callback_data=f"/cdone {chat_id}")
   )
-  bot.send_message(idd[1],f"User Provided Address \n\n👉 Address:- {message.text}\n\nKindly Refund To him\n\n⚠️ After Paying Click on Confirm",reply_markup=keyboard)
+  bot.send_message(idd[1],f"Order Id: `{id}`\nUser Provided Address \n\n👉 Address:- `{message.text}`\n\nKindly Refund To him\n\n⚠️ After Paying Click on Confirm",reply_markup=keyboard,parse_mode="markdown")
   collection.update_one({"uid":int(idd[0])}, {"$set": {"status": "refunded"}}, upsert=True)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/cdone'))
 def handle_cdone_query(call):
   id = call.data.split("/cdone ")[1]
+  bot.delete_message(call.message.chat.id,call.message.id)
   bot.send_message(id,"😊 Our Admins Has Paid You")
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/done'))
 def handle_done_query(call):
@@ -577,40 +580,22 @@ def handle_done_query(call):
   collection = db['orders']
   id = call.data.split('/done ')[1]
   collection.update_one({"uid": int(id)}, {"$set": {"user_id2": call.message.chat.id}})
-  data = collection.find({
-    "uid":int(id)
-  })
-  keyboard = InlineKeyboardMarkup()
-  keyboard.row(
-    InlineKeyboardButton(
-      "📞 Verify",callback_data=f"/verify {id} {call.message.chat.id}")
-  )
-  for datas in data:
-    bot.send_message(datas['admin'],"I have Paid Kindly Pay to me")
-    bot.send_message(datas['admin'],"Kindly Click on Below Button To Verify",reply_markup=keyboard)
-    bot.send_message(call.message.chat.id,"👉 Kindly Enter Your Details Where you want to recieve the Payment")
-    bot.register_next_step_handler(call.message,user_adrs,id)
+  bot.send_message(call.message.chat.id,"👉 Kindly Enter Your Details Where you want to recieve the Payment")
+  bot.register_next_step_handler(call.message,user_adrs,id)
 
 
 def user_adrs(message,id):
   collection = db['orders']
   collection.update_one({"uid": int(id)}, {"$set": {"user_adrs": message.text}})
-  bot.send_message(message.chat.id,"Kindly Wait Now")
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith('/verify'))
-def handle_verify_query(call):
-  collection = db['orders']
-  idd = call.data.split('/verify ')[1]
-  id = idd.split(" ")
-  data = collection.find({
-    "uid":int(id[0])
+  data = collection.find_one({
+    "uid":int(id)
   })
+  bot.send_message(message.chat.id,"Kindly Wait Now")
   keyboard = InlineKeyboardMarkup()
   keyboard.row(
-    InlineKeyboardButton("👍 Recieved",callback_data=f"/ureceived {id[0]}"),InlineKeyboardButton("👎 Not Recieved", callback_data=f"/ureceived no {id[0]} {id[1]}"))
-  for datas in data:
-    bot.delete_message(call.message.chat.id,call.message.id)
-    bot.send_message(datas['user_id'],"Kindly Check Your Wallet \n\nAnd answer via the given Buttons",reply_markup=keyboard)
+    InlineKeyboardButton("👍 Recieved",callback_data=f"/ureceived {id}"),InlineKeyboardButton("👎 Not Recieved", callback_data=f"/ureceived no {id} {data['admin']}"))
+  bot.send_message(data['user_id'],"Kindly Check Your Wallet \n\nAnd answer via the given Buttons",reply_markup=keyboard)
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/ureceived'))
 def handle_ureceived_query(call):
@@ -633,7 +618,7 @@ def handle_ureceived_query(call):
     for datas in data:
       admin = datas['admin']
       adress = datas["user_adrs"]
-      bot.send_message(admin,f"User Marked The Payment Received\n\nKindly Release Assests on below address\n\n{adress}\n\nAfter Paying Click on ✅ Paid",reply_markup=keyboard)
+      bot.send_message(admin,f"order Id :- `{id[0]}`\n\nUser Marked The Payment Received\n\nKindly Release Assests on below address\n\n`{adress}`\n\nAfter Paying Click on ✅ Paid",reply_markup=keyboard,parse_mode="markdown")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('/paid'))
 def handle_paid_query(call):
@@ -768,6 +753,8 @@ def handle_order_callback(call):
           keyboard = InlineKeyboardMarkup().add(delete_button)
 
           bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
+        
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("delete_ad:"))
 def delete_ad_callback(call):
@@ -823,4 +810,4 @@ def amount_handler(message):
   user_states[message.chat.id] = "STARTED"
 bot.infinity_polling(
   print("bot lanuched ...")
-    )
+)
