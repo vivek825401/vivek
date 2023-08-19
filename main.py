@@ -524,12 +524,12 @@ def handle_recieved_query(call):
     bot.send_message(idd[1],"Your Payment Not Recieved",reply_markup=keyboard)
   else:
     collection.update_one({"uid": int(idd[0])}, {"$set": {"status": "paid"}})
-    data = collection.find_one({"user_id": call.message.chat.id, "uid": int(idd[0])})
+    data = collection.find_one({"user_id": idd[1], "uid": int(idd[0])})
     method = collections.find_one({"_id": ObjectId(data['method'])})  
-    trade = collection.count_documents({"user_id": call.message.chat.id,"status":"completed"})
+    trade = collection.count_documents({"user_id": idd[1],"status":"completed"})
     skeyboard = InlineKeyboardMarkup()
     skeyboard.row(InlineKeyboardButton("🛒 Deal Now",url=f"https://t.me/{bot_info.username}?start=order{idd[0]}"))
-    bot.send_message(paych,f"*New Ad Created *\n\n👤 *Name* = `{call.message.chat.first_name}`\n*📝 Ad For* = `{data['type']}`\n🧾 *{data['type']}ing Assets* = `{data['famo']}`\n💲 *{data['type']}ing in* = `{data['aamo']}`\n*🗣️ Total Trades* = `{trade}`\n\n🏧 *Payment Method* :-\n*🔹 Method Name* = `{method['method_name']}`\n🔹 *Method Details* = `{method['method_details']}`\n⌛ *Status* :- `Active`", reply_markup=skeyboard,parse_mode='markdown')
+    bot.send_message(paych,f"*New Ad Created *\n\n*📝 Ad For* = `{data['type']}`\n🧾 *{data['type']}ing Assets* = `{data['famo']}`\n💲 *{data['type']}ing in* = `{data['aamo']}`\n*🗣️ Total Trades* = `{trade}`\n\n🏧 *Payment Method* :-\n*🔹 Method Name* = `{method['method_name']}`\n🔹 *Method Details* = `{method['method_details']}`\n⌛ *Status* :- `Active`", reply_markup=skeyboard,parse_mode='markdown')
     keyboard = InlineKeyboardMarkup()
     keyboard.row(
     InlineKeyboardButton("💱 Refund",callback_data=f"/refund {idd[0]} {call.message.chat.id} {idd[1]}")
