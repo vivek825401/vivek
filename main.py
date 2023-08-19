@@ -741,7 +741,7 @@ def handle_order_callback(call):
   elif option == 'your_ads':
     collection = db['orders']
     collections = db['pay-method']
-    datas = collection.find({"user_id": call.message.chat.id,"status":"active"})
+    datas = collection.find({"user_id": call.message.chat.id})
     
     if collection.count_documents({"user_id": call.message.chat.id,"status":"active"}) == 0 :
       
