@@ -15,7 +15,7 @@ user_state = {}
 user_data = {}
 users_collection = db["users"]
 admch = "-5724936702 "
-paych = "@p2psellerbot"
+paych = "@P2PAdSSHOW"
 admin_id = 1548793801
 
 
