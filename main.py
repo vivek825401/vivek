@@ -19,7 +19,6 @@ paych = "@P2PAdSSHOW"
 admin_id = 1548793801
 
 
-
 #admin part
 @bot.message_handler(commands=['promote'])
 def promote_to_admin(message):
@@ -686,8 +685,10 @@ def handle_order_callback(call):
         method_cursor = collections.find_one({"_id": ObjectId(data['method'])})
         user = bot.get_chat(data['user_id'])
         trade = collection.count_documents({"user_id": data['user_id'],"status":"completed"})
-        
-        message_text = (
+        if method_cursor is None:
+          print("no")
+        else:
+          message_text = (
             f"👤 *Name*: `{user.first_name}`\n"
             f"*📝 Ad For*: `{data['type']}`\n"
             f"🧾 *{data['type']}ing Assets*: `{data['famo']}`\n"
@@ -697,9 +698,9 @@ def handle_order_callback(call):
             f"*🔹 Method Name*: `{method_cursor['method_name']}`\n"
             f"🔹 *Method Details*: `{method_cursor['method_details']}`"
         )
-        keyboard = InlineKeyboardMarkup()
-        keyboard.row(InlineKeyboardButton("💼 Sell Now", url=f"https://t.me/{bot_info.username}?start=order{uid}"))
-        bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
+          keyboard = InlineKeyboardMarkup()
+          keyboard.row(InlineKeyboardButton("💼 Sell Now", url=f"https://t.me/{bot_info.username}?start=order{uid}"))
+          bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
 
 
   elif option == 'buy':
@@ -716,8 +717,10 @@ def handle_order_callback(call):
         method_cursor = collections.find_one({"_id": ObjectId(data['method'])})
         user = bot.get_chat(data['user_id'])
         trade = collection.count_documents({"user_id": data['user_id'],"status":"completed"})
-        
-        message_text = (
+        if method_cursor is None:
+          print("no")
+        else:
+          message_text = (
             f"👤 *Name*: `{user.first_name}`\n"
             f"*📝 Ad For*: `{data['type']}`\n"
             f"🧾 *{data['type']}ing Assets*: `{data['famo']}`\n"
@@ -727,9 +730,9 @@ def handle_order_callback(call):
             f"*🔹 Method Name*: `{method_cursor['method_name']}`\n"
             f"🔹 *Method Details*: `{method_cursor['method_details']}`"
         )
-        keyboard = InlineKeyboardMarkup()
-        keyboard.row(InlineKeyboardButton("💼 Buy Now",url=f"https://t.me/{bot_info.username}?start=order{uid}"))
-        bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
+          keyboard = InlineKeyboardMarkup()
+          keyboard.row(InlineKeyboardButton("💼 Buy Now",url=f"https://t.me/{bot_info.username}?start=order{uid}"))
+          bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard, parse_mode='markdown')
   elif option == 'create_ad':
       keyboard = InlineKeyboardMarkup()
       keyboard.row(
@@ -826,4 +829,4 @@ def amount_handler(message):
   user_states[message.chat.id] = "STARTED"
 bot.infinity_polling(
   print("bot lanuched ...")
-)
+    )
