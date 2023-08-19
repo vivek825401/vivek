@@ -524,7 +524,7 @@ def handle_recieved_query(call):
     bot.send_message(idd[1],"Your Payment Not Recieved",reply_markup=keyboard)
   else:
     collection.update_one({"uid": int(idd[0])}, {"$set": {"status": "paid"}})
-    data = collection.find_one({"user_id": idd[1], "uid": int(idd[0])})
+    data = collection.find_one({"uid": int(idd[0])})
     method = collections.find_one({"_id": ObjectId(data['method'])})  
     trade = collection.count_documents({"user_id": idd[1],"status":"completed"})
     skeyboard = InlineKeyboardMarkup()
